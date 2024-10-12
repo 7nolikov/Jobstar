@@ -8,3 +8,5 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.5 // PostgreSQL driver
 )
+
+require github.com/joho/godotenv v1.5.1 // indirect

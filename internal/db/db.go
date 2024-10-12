@@ -1,12 +1,11 @@
 package db
 
 import (
-    "fmt"
     "log"
     "os"
 
-    _ "github.com/lib/pq"
     "github.com/jmoiron/sqlx"
+    _ "github.com/lib/pq"
 )
 
 var DB *sqlx.DB
@@ -14,8 +13,10 @@ var DB *sqlx.DB
 func InitDB() {
     connStr := os.Getenv("DB_CONNECTION_STRING")
     if connStr == "" {
-        connStr = "postgres://user:password@localhost:5432/yourdb?sslmode=disable"
+        log.Fatal("DB_CONNECTION_STRING is not set")
     }
+
+    log.Printf("Connecting to database with: %s\n", connStr) // Debugging line
 
     var err error
     DB, err = sqlx.Connect("postgres", connStr)
@@ -23,5 +24,5 @@ func InitDB() {
         log.Fatalf("Failed to connect to database: %v", err)
     }
 
-    fmt.Println("Database connection established")
+    log.Println("Database connection established")
 }

@@ -7,9 +7,16 @@ import (
 	"github.com/7nolikov/Jobstar/internal/db"
 	"github.com/7nolikov/Jobstar/internal/handlers"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found. Continuing with environment variables.")
+	}
+
 	// Initialize the database connection
 	db.InitDB()
 
