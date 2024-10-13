@@ -1,0 +1,25 @@
+{{ define "vacancy_item" }}
+<div class="bg-white p-4 rounded shadow flex justify-between items-center">
+    <div>
+        <h2 class="text-xl font-semibold">{{ .Title }}</h2>
+        <p class="text-gray-600">{{ .Description }}</p>
+        <p class="text-gray-500">Location: {{ .Location }}</p>
+    </div>
+    <div class="space-x-2">
+        <button 
+            hx-get="/vacancies/{{ .ID }}/edit" 
+            hx-target="#modal" 
+            hx-swap="innerHTML"
+            class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+            Edit
+        </button>
+        <button 
+            hx-delete="/vacancies/{{ .ID }}" 
+            hx-target="#vacancies-list" 
+            hx-swap="outerHTML"
+            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+            Delete
+        </button>
+    </div>
+</div>
+{{ end }}

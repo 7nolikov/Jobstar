@@ -20,25 +20,24 @@ func main() {
 	// Initialize the database connection
 	db.InitDB()
 
+	// Run database migrations
+	db.RunMigrations()
+
 	// Set up the router
 	r := mux.NewRouter()
 
-	// Vacancy routes
+	// Define your routes
 	r.HandleFunc("/vacancies", handlers.ListVacancies).Methods("GET")
+	r.HandleFunc("/vacancies/new", handlers.NewVacancyForm).Methods("GET")
 	r.HandleFunc("/vacancies", handlers.CreateVacancy).Methods("POST")
+	r.HandleFunc("/vacancies/{id}/edit", handlers.EditVacancyForm).Methods("GET")
 	r.HandleFunc("/vacancies/{id}", handlers.UpdateVacancy).Methods("PUT")
 	r.HandleFunc("/vacancies/{id}", handlers.DeleteVacancy).Methods("DELETE")
 
-	// Candidate routes
-	r.HandleFunc("/candidates", handlers.ListCandidates).Methods("GET")
-	r.HandleFunc("/candidates", handlers.CreateCandidate).Methods("POST")
-	r.HandleFunc("/candidates/{id}/state", handlers.UpdateCandidateState).Methods("POST")
-
-	// Statistics route
-	r.HandleFunc("/statistics", handlers.ShowStatistics).Methods("GET")
-
-	// Serve static files (e.g., templates, static assets)
-	// r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	// Define the root route to redirect to /vacancies
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
+	})
 
 	// Start the server
 	log.Println("Server starting on port 8080...")
