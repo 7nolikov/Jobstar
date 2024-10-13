@@ -10,12 +10,12 @@ import (
 var templates *template.Template
 
 func init() {
-    // Parse all templates
+    // Parse base templates and partials
     templates = template.Must(template.ParseGlob(filepath.Join("templates", "*.html")))
     templates = template.Must(templates.ParseGlob(filepath.Join("templates", "partials", "*.html")))
 }
 
-// RenderTemplate renders a template with given data
+// RenderTemplate renders a specified template with data
 func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
     err := templates.ExecuteTemplate(w, tmpl+".html", data)
     if err != nil {

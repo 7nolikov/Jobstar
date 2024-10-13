@@ -6,12 +6,12 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      # Database connection string
       DB_CONNECTION_STRING: "postgres://root:root@postgres:5432/service?sslmode=disable"
-      # Redis connection details
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
     networks:
@@ -20,21 +20,39 @@ services:
   postgres:
     image: postgres:15
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-root}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-root}
-      - POSTGRES_DB=${POSTGRES_DB:-service}
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
+      POSTGRES_DB: ${POSTGRES_DB:-service}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   backend:
     driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
