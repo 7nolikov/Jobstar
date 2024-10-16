@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/7nolikov/Jobstar/internal/db"
 	"github.com/7nolikov/Jobstar/internal/handlers"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -26,6 +29,10 @@ func main() {
 	// Set up the router
 	r := mux.NewRouter()
 
+	// Serve static files
+	staticDir := "/static/"
+	r.PathPrefix(staticDir).Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir(filepath.Join(".", "static")))))
+
 	// Define your routes
 	r.HandleFunc("/vacancies", handlers.ListVacancies).Methods("GET")
 	r.HandleFunc("/vacancies/new", handlers.NewVacancyForm).Methods("GET")
@@ -39,7 +46,14 @@ func main() {
 		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
 	})
 
+	csrfKey := os.Getenv("CSRF_KEY")
+	// Initialize CSRF protection
+	csrfMiddleware := csrf.Protect(
+		[]byte(csrfKey), // Replace with your secure key
+		csrf.Secure(false),              // Set to true in production (requires HTTPS)
+	)
+
 	// Start the server
 	log.Println("Server starting on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", csrfMiddleware(r)))
 }

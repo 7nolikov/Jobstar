@@ -29,7 +29,14 @@
 
     <main class="max-w-7xl mx-auto p-4">{{ template "content" . }}</main>
 
-    <!-- JavaScript to handle modal visibility -->
+    <!-- Modal for Forms -->
+    <div
+      id="modal"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+    >
+      <!-- Content will be loaded here via HTMX -->
+    </div>
+
     <script>
       document.body.addEventListener("htmx:afterSwap", function (event) {
         if (event.detail.target.id === "modal") {
@@ -40,6 +47,18 @@
             event.detail.target.classList.remove("hidden");
           } else {
             event.detail.target.classList.add("hidden");
+          }
+        }
+      });
+
+      // Listen for the custom 'closeModal' trigger
+      document.body.addEventListener("htmx:trigger", function (event) {
+        if (event.detail.name === "closeModal") {
+          // Hide the modal
+          var modal = document.getElementById("modal");
+          if (modal) {
+            modal.classList.add("hidden");
+            modal.innerHTML = "";
           }
         }
       });

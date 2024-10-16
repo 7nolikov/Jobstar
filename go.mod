@@ -13,6 +13,8 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.18.1 // indirect
+	github.com/gorilla/csrf v1.7.2 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect

@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
-    "log"
 
 	"github.com/7nolikov/Jobstar/internal/db"
 	"github.com/7nolikov/Jobstar/internal/models"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
@@ -27,8 +28,10 @@ func ListVacancies(w http.ResponseWriter, r *http.Request) {
 
 // NewVacancyForm handles GET /vacancies/new
 func NewVacancyForm(w http.ResponseWriter, r *http.Request) {
-    // Render the add vacancy form partial
-    RenderTemplate(w, "add_vacancy_form", nil)
+    data := map[string]interface{}{
+        "csrfField": csrf.TemplateField(r),
+    }
+    RenderTemplate(w, "add_vacancy_form", data)
 }
 
 // CreateVacancy handles POST /vacancies
@@ -74,6 +77,9 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 
     // Check if request is from HTMX
     if r.Header.Get("HX-Request") == "true" {
+        // Set a custom HTTP header to trigger modal closure
+        w.Header().Set("HX-Trigger", "closeModal")
+
         // Return the vacancy item partial
         RenderTemplate(w, "vacancy_item", vacancy)
     } else {
