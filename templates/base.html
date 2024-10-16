@@ -1,77 +1,80 @@
 {{ define "base" }}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Jobstar - Manage Vacancies</title>
-    <!-- Tailwind CSS CDN -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <!-- HTMX CDN -->
-    <script src="https://unpkg.com/htmx.org@1.9.3"></script>
-  </head>
-  <body class="bg-gray-100">
-    <nav class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex items-center justify-between">
-          <div class="text-xl font-bold">Jobstar</div>
-          <div>
-            <a href="/vacancies" class="text-gray-700 hover:text-gray-900 px-3"
-              >Vacancies</a
-            >
-            <!-- Add more navigation links here -->
-          </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Jobstar - Manage Vacancies</title>
+  <!-- Tailwind CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <!-- HTMX CDN -->
+  <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+  <!-- CSRF Token Meta Tag -->
+  <meta name="csrf-token" content="{{ .csrfToken }}" />
+</head>
+
+<body class="bg-gray-100">
+  <nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="text-xl font-bold">Jobstar</div>
+        <div>
+          <a href="/vacancies" class="text-gray-700 hover:text-gray-900 px-3">Vacancies</a>
+          <!-- Add more navigation links here -->
         </div>
       </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto p-4">{{ template "content" . }}</main>
-
-    <!-- Modal for Forms -->
-    <div
-      id="modal"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
-    >
-      <!-- Content will be loaded here via HTMX -->
     </div>
+  </nav>
 
-    <script>
-      document.body.addEventListener("htmx:afterSwap", function (event) {
-        if (event.detail.target.id === "modal") {
-          if (
-            event.detail.xhr.status === 200 &&
-            event.detail.elt.innerHTML.trim() !== ""
-          ) {
-            event.detail.target.classList.remove("hidden");
-          } else {
-            event.detail.target.classList.add("hidden");
-          }
-        }
-      });
+  <main class="max-w-7xl mx-auto p-4">{{ template "content" . }}</main>
 
-      // Listen for the custom 'closeModal' trigger
-      document.body.addEventListener("htmx:trigger", function (event) {
-        if (event.detail.name === "closeModal") {
-          // Hide the modal
-          var modal = document.getElementById("modal");
-          if (modal) {
-            modal.classList.add("hidden");
-            modal.innerHTML = "";
-          }
-        }
-      });
+  <!-- Modal for Forms -->
+  <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <!-- Content will be loaded here via HTMX -->
+  </div>
 
-      // Optional: Close modal when clicking outside the modal content
-      document.getElementById("modal").addEventListener("click", function (e) {
-        if (e.target === this) {
-          this.classList.add("hidden");
-          // Optionally, clear the modal content
-          this.innerHTML = "";
+  <script>
+    // Configure HTMX to include CSRF token in headers
+    document.addEventListener("htmx:configRequest", function (event) {
+      var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+      event.detail.headers['X-CSRF-Token'] = token;
+    });
+    
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event.detail.target.id === "modal") {
+        if (
+          event.detail.xhr.status === 200 &&
+          event.detail.elt.innerHTML.trim() !== ""
+        ) {
+          event.detail.target.classList.remove("hidden");
+        } else {
+          event.detail.target.classList.add("hidden");
         }
-      });
-    </script>
-  </body>
+      }
+    });
+
+    // Listen for the custom 'closeModal' trigger
+    document.body.addEventListener("htmx:trigger", function (event) {
+      if (event.detail.name === "closeModal") {
+        // Hide the modal
+        var modal = document.getElementById("modal");
+        if (modal) {
+          modal.classList.add("hidden");
+          modal.innerHTML = "";
+        }
+      }
+    });
+
+    // Optional: Close modal when clicking outside the modal content
+    document.getElementById("modal").addEventListener("click", function (e) {
+      if (e.target === this) {
+        this.classList.add("hidden");
+        // Optionally, clear the modal content
+        this.innerHTML = "";
+      }
+    });
+  </script>
+</body>
+
 </html>
 {{ end }}

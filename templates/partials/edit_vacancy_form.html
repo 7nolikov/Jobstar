@@ -1,63 +1,33 @@
 {{ define "edit_vacancy_form" }}
 <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-semibold">Edit Vacancy</h2>
-    <button
-      hx-get="/vacancies"
-      hx-target="#modal"
-      hx-swap="outerHTML"
-      class="text-gray-500 hover:text-gray-700"
-    >
-      ✕
-    </button>
-  </div>
-  <form
-    hx-put="/vacancies/{{ .ID }}"
-    hx-target="#vacancy-{{ .ID }}"
-    hx-swap="outerHTML"
-    class="space-y-4"
-  >
-    <!-- CSRF Token -->
-    {{ .csrfField }}
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Edit Vacancy</h2>
+        <button hx-get="/vacancies" hx-target="#modal" hx-swap="outerHTML" class="text-gray-500 hover:text-gray-700">
+            ✕
+        </button>
+    </div>
+    <form hx-put="/vacancies/{{ .ID }}" hx-target="#vacancy-{{ .ID }}" hx-swap="outerHTML" class="space-y-4">
+        <!-- CSRF Token -->
+        {{ .csrfField }}
 
-    <div>
-      <label class="block text-gray-700">Title</label>
-      <input
-        type="text"
-        name="title"
-        value="{{ .Title }}"
-        required
-        class="w-full mt-1 p-2 border rounded"
-      />
-    </div>
-    <div>
-      <label class="block text-gray-700">Description</label>
-      <textarea
-        name="description"
-        required
-        class="w-full mt-1 p-2 border rounded"
-      >
-{{ .Description }}</textarea
-      >
-    </div>
-    <div>
-      <label class="block text-gray-700">Location</label>
-      <input
-        type="text"
-        name="location"
-        value="{{ .Location }}"
-        required
-        class="w-full mt-1 p-2 border rounded"
-      />
-    </div>
-    <div class="flex justify-end">
-      <button
-        type="submit"
-        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-      >
-        Update Vacancy
-      </button>
-    </div>
-  </form>
+        <div>
+            <label class="block text-gray-700">Title</label>
+            <input type="text" name="title" value="{{ .Title }}" required class="w-full mt-1 p-2 border rounded" />
+        </div>
+        <div>
+            <label class="block text-gray-700">Description</label>
+            <textarea name="description" required class="w-full mt-1 p-2 border rounded">{{ .Description }}</textarea>
+        </div>
+        <div>
+            <label class="block text-gray-700">Location</label>
+            <input type="text" name="location" value="{{ .Location }}" required
+                class="w-full mt-1 p-2 border rounded" />
+        </div>
+        <div class="flex justify-end">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Update Vacancy
+            </button>
+        </div>
+    </form>
 </div>
 {{ end }}

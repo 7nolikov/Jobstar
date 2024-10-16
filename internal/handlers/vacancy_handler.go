@@ -13,79 +13,80 @@ import (
 
 // ListVacancies handles GET /vacancies
 func ListVacancies(w http.ResponseWriter, r *http.Request) {
-    var vacancies []models.Vacancy
-    err := db.DB.Select(&vacancies, "SELECT * FROM vacancies ORDER BY id DESC")
-    if err != nil {
-        log.Printf("Error fetching vacancies: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	var vacancies []models.Vacancy
+	err := db.DB.Select(&vacancies, "SELECT * FROM vacancies ORDER BY id DESC")
+	if err != nil {
+		log.Printf("Error fetching vacancies: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    RenderTemplate(w, "base", map[string]interface{}{
-        "Vacancies": vacancies,
-    })
+	RenderTemplate(w, "base", map[string]interface{}{
+		"Vacancies": vacancies,
+		"csrfToken": csrf.Token(r),
+	})
 }
 
 // NewVacancyForm handles GET /vacancies/new
 func NewVacancyForm(w http.ResponseWriter, r *http.Request) {
-    data := map[string]interface{}{
-        "csrfField": csrf.TemplateField(r),
-    }
-    RenderTemplate(w, "add_vacancy_form", data)
+	data := map[string]interface{}{
+		"csrfField": csrf.TemplateField(r),
+	}
+	RenderTemplate(w, "add_vacancy_form", data)
 }
 
 // CreateVacancy handles POST /vacancies
 func CreateVacancy(w http.ResponseWriter, r *http.Request) {
-    var vacancy models.Vacancy
-    err := r.ParseForm()
-    if err != nil {
-        log.Printf("Error parsing form: %v", err)
-        http.Error(w, "Bad Request", http.StatusBadRequest)
-        return
-    }
+	var vacancy models.Vacancy
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
-    vacancy.Title = r.FormValue("title")
-    vacancy.Description = r.FormValue("description")
-    vacancy.Location = r.FormValue("location")
+	vacancy.Title = r.FormValue("title")
+	vacancy.Description = r.FormValue("description")
+	vacancy.Location = r.FormValue("location")
 
-    query := `INSERT INTO vacancies (title, description, location, created_at, updated_at)
+	query := `INSERT INTO vacancies (title, description, location, created_at, updated_at)
               VALUES (:title, :description, :location, NOW(), NOW()) RETURNING id`
 
-    stmt, err := db.DB.PrepareNamed(query)
-    if err != nil {
-        log.Printf("Error preparing query: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	stmt, err := db.DB.PrepareNamed(query)
+	if err != nil {
+		log.Printf("Error preparing query: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    err = stmt.QueryRowx(vacancy).Scan(&vacancy.ID)
-    if err != nil {
-        log.Printf("Error executing query: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	err = stmt.QueryRowx(vacancy).Scan(&vacancy.ID)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    // Fetch the newly created vacancy
-    err = db.DB.Get(&vacancy, "SELECT * FROM vacancies WHERE id=$1", vacancy.ID)
-    if err != nil {
-        log.Printf("Error fetching vacancy after creation: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	// Fetch the newly created vacancy
+	err = db.DB.Get(&vacancy, "SELECT * FROM vacancies WHERE id=$1", vacancy.ID)
+	if err != nil {
+		log.Printf("Error fetching vacancy after creation: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    log.Printf("Vacancy created with ID: %d", vacancy.ID)
+	log.Printf("Vacancy created with ID: %d", vacancy.ID)
 
-    // Check if request is from HTMX
-    if r.Header.Get("HX-Request") == "true" {
-        // Set a custom HTTP header to trigger modal closure
-        w.Header().Set("HX-Trigger", "closeModal")
+	// Check if request is from HTMX
+	if r.Header.Get("HX-Request") == "true" {
+		// Set a custom HTTP header to trigger modal closure
+		w.Header().Set("HX-Trigger", "closeModal")
 
-        // Return the vacancy item partial
-        RenderTemplate(w, "vacancy_item", vacancy)
-    } else {
-        // Redirect to vacancies page
-        http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
-    }
+		// Return the vacancy item partial
+		RenderTemplate(w, "vacancy_item", vacancy)
+	} else {
+		// Redirect to vacancies page
+		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
+	}
 }
 
 // EditVacancyForm handles GET /vacancies/{id}/edit
@@ -100,8 +101,12 @@ func EditVacancyForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Render the edit vacancy form partial
-	RenderTemplate(w, "edit_vacancy_form", vacancy)
+	data := map[string]interface{}{
+		"Vacancy":   vacancy,
+		"csrfField": csrf.TemplateField(r),
+	}
+
+	RenderTemplate(w, "edit_vacancy_form", data)
 }
 
 // UpdateVacancy handles PUT /vacancies/{id}
