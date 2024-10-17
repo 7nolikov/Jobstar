@@ -1,11 +1,8 @@
-{{ define "content" }}
+{{ define "candidates" }}
 <div class="flex justify-between items-center mb-4">
   <h1 class="text-2xl font-semibold">Candidates</h1>
-  <button 
-      hx-get="/candidates/new" 
-      hx-target="#modal" 
-      hx-swap="innerHTML"
-      class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+  <button hx-get="/candidates/new" hx-target="#modal" hx-swap="innerHTML"
+    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
     Add Candidate
   </button>
 </div>
@@ -13,9 +10,9 @@
 <!-- Candidates List -->
 <div id="candidates-list" class="space-y-4">
   {{ range .Candidates }}
-     {{ template "candidate_item" . }}
+  {{ template "candidate_item" . }}
   {{ else }}
-      <p class="text-gray-600">No candidates available.</p>
+  <p class="text-gray-600">No candidates available.</p>
   {{ end }}
 </div>
 {{ end }}

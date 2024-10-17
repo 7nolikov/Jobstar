@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -13,10 +14,18 @@ import (
 
 // RunMigrations applies all pending migrations
 func RunMigrations() {
-	connStr := os.Getenv("DB_CONNECTION_STRING")
-	if connStr == "" {
-		log.Fatal("DB_CONNECTION_STRING is not set")
+	// Retrieve individual components
+	dbUser := os.Getenv("POSTGRES_USER")
+	dbPassword := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("POSTGRES_DB")
+
+	// Validate environment variables
+	if dbUser == "" || dbPassword == "" || dbName == "" {
+		log.Fatal("One or more required environment variables are missing.")
 	}
+
+	// Construct the connection string
+	connStr := fmt.Sprintf("postgresql://%s:%s@localhost:5432/%s?sslmode=disable", dbUser, dbPassword, dbName)
 
 	// Initialize the database driver
 	db, err := sqlx.Connect("postgres", connStr)

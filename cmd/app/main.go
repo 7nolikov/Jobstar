@@ -8,6 +8,7 @@ import (
 
 	"github.com/7nolikov/Jobstar/internal/db"
 	"github.com/7nolikov/Jobstar/internal/handlers"
+	"github.com/7nolikov/Jobstar/internal/templates"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -25,6 +26,9 @@ func main() {
 
 	// Run database migrations
 	db.RunMigrations()
+
+	// Initialize the template cache
+	templates.Init()
 
 	// Set up the router
 	r := mux.NewRouter()

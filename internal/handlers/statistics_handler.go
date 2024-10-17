@@ -5,15 +5,16 @@ import (
 	"net/http"
 
 	"github.com/7nolikov/Jobstar/internal/db"
+	"github.com/7nolikov/Jobstar/internal/templates"
 	"github.com/gorilla/csrf"
 )
 
 // StatisticsData holds the data for the Statistics page
 type StatisticsData struct {
-	TotalVacancies     int
-	TotalCandidates    int
-	FilledVacancies    int
-	PendingCandidates  int
+	TotalVacancies    int
+	TotalCandidates   int
+	FilledVacancies   int
+	PendingCandidates int
 }
 
 // StatisticsHandler handles GET /statistics
@@ -36,7 +37,7 @@ func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch Filled Vacancies (assuming filled vacancies are determined by some criteria, e.g., status)
+	// Fetch Filled Vacancies (assuming a 'filled' boolean column)
 	err = db.DB.Get(&data.FilledVacancies, "SELECT COUNT(*) FROM vacancies WHERE filled = TRUE")
 	if err != nil {
 		log.Printf("Error fetching filled vacancies: %v", err)
@@ -44,7 +45,7 @@ func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch Pending Candidates (assuming pending candidates are those not yet interviewed or hired)
+	// Fetch Pending Candidates (assuming a 'status' column)
 	err = db.DB.Get(&data.PendingCandidates, "SELECT COUNT(*) FROM candidates WHERE status = 'pending'")
 	if err != nil {
 		log.Printf("Error fetching pending candidates: %v", err)
@@ -52,8 +53,11 @@ func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	RenderTemplate(w, "base", map[string]interface{}{
+	// Pass statistics data to the template
+	dataMap := map[string]interface{}{
 		"Statistics": data,
 		"csrfToken":  csrf.Token(r),
-	})
+	}
+
+	templates.RenderTemplate(w, "statistics", dataMap)
 }
