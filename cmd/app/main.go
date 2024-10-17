@@ -33,7 +33,10 @@ func main() {
 	staticDir := "/static/"
 	r.PathPrefix(staticDir).Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir(filepath.Join(".", "static")))))
 
-	// Define your routes
+	// Landing route
+	r.HandleFunc("/", handlers.LandingPage).Methods("GET")
+
+	// Vacancies routes
 	r.HandleFunc("/vacancies", handlers.ListVacancies).Methods("GET")
 	r.HandleFunc("/vacancies/new", handlers.NewVacancyForm).Methods("GET")
 	r.HandleFunc("/vacancies", handlers.CreateVacancy).Methods("POST")
@@ -41,16 +44,22 @@ func main() {
 	r.HandleFunc("/vacancies/{id}", handlers.UpdateVacancy).Methods("PUT")
 	r.HandleFunc("/vacancies/{id}", handlers.DeleteVacancy).Methods("DELETE")
 
-	// Define the root route to redirect to /vacancies
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
-	})
+	// Candidates Routes
+	r.HandleFunc("/candidates", handlers.ListCandidates).Methods("GET")
+	r.HandleFunc("/candidates/new", handlers.NewCandidateForm).Methods("GET")
+	r.HandleFunc("/candidates", handlers.CreateCandidate).Methods("POST")
+	r.HandleFunc("/candidates/{id}/edit", handlers.EditCandidateForm).Methods("GET")
+	r.HandleFunc("/candidates/{id}", handlers.UpdateCandidate).Methods("PUT")
+	r.HandleFunc("/candidates/{id}", handlers.DeleteCandidate).Methods("DELETE")
+
+	// Statistics Route
+	r.HandleFunc("/statistics", handlers.StatisticsHandler).Methods("GET")
 
 	csrfKey := os.Getenv("CSRF_KEY")
 	// Initialize CSRF protection
 	csrfMiddleware := csrf.Protect(
-		[]byte(csrfKey), // Replace with your secure key
-		csrf.Secure(false),              // Set to true in production (requires HTTPS)
+		[]byte(csrfKey),    // Replace with your secure key
+		csrf.Secure(false), // Set to true in production (requires HTTPS)
 	)
 
 	// Start the server

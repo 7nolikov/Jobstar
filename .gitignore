@@ -31,3 +31,6 @@ go.work.sum
 # IDE files
 .idea/
 .vscode/
+
+# Node modules directory
+/ui/node_modules/

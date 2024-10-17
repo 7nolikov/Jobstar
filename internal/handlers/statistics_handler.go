@@ -1,72 +1,59 @@
 package handlers
 
 import (
-    "bytes"
-	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/7nolikov/Jobstar/internal/db"
-	"github.com/go-echarts/go-echarts/v2/charts"
-	"github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/gorilla/csrf"
 )
 
-func GetPipelineStatistics() (map[string]int, error) {
-	stats := make(map[string]int)
-	rows, err := db.DB.Queryx("SELECT state, COUNT(*) as count FROM candidates GROUP BY state")
-	if err != nil {
-		return stats, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var state string
-		var count int
-		err = rows.Scan(&state, &count)
-		if err != nil {
-			return stats, err
-		}
-		stats[state] = count
-	}
-	return stats, nil
+// StatisticsData holds the data for the Statistics page
+type StatisticsData struct {
+	TotalVacancies     int
+	TotalCandidates    int
+	FilledVacancies    int
+	PendingCandidates  int
 }
 
-func ShowStatistics(w http.ResponseWriter, r *http.Request) {
-	stats, err := GetPipelineStatistics()
+// StatisticsHandler handles GET /statistics
+func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
+	var data StatisticsData
+
+	// Fetch Total Vacancies
+	err := db.DB.Get(&data.TotalVacancies, "SELECT COUNT(*) FROM vacancies")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error fetching total vacancies: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	pie := charts.NewPie()
-	pie.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
-		Title: "Candidate Pipeline Statistics",
-	}))
-
-	var items []opts.PieData
-	for state, count := range stats {
-		items = append(items, opts.PieData{Name: state, Value: count})
-	}
-
-	pie.AddSeries("States", items)
-
-	tmpl, err := template.ParseFiles("templates/statistics.html")
+	// Fetch Total Candidates
+	err = db.DB.Get(&data.TotalCandidates, "SELECT COUNT(*) FROM candidates")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error fetching total candidates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	// Create a buffer to hold the rendered pie chart
-    var buf bytes.Buffer
-    err = pie.Render(&buf)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	// Fetch Filled Vacancies (assuming filled vacancies are determined by some criteria, e.g., status)
+	err = db.DB.Get(&data.FilledVacancies, "SELECT COUNT(*) FROM vacancies WHERE filled = TRUE")
+	if err != nil {
+		log.Printf("Error fetching filled vacancies: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    // Execute the template with the rendered pie chart
-    err = tmpl.Execute(w, template.HTML(buf.String()))
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	// Fetch Pending Candidates (assuming pending candidates are those not yet interviewed or hired)
+	err = db.DB.Get(&data.PendingCandidates, "SELECT COUNT(*) FROM candidates WHERE status = 'pending'")
+	if err != nil {
+		log.Printf("Error fetching pending candidates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	RenderTemplate(w, "base", map[string]interface{}{
+		"Statistics": data,
+		"csrfToken":  csrf.Token(r),
+	})
 }

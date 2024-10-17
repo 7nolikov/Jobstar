@@ -4,11 +4,11 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Jobstar - Manage Vacancies</title>
-  <!-- Tailwind CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-  <!-- HTMX CDN -->
-  <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+  <title>Jobstar - Manage Job Search</title>
+  <!-- Tailwind CSS -->
+  <link href="/static/css/tailwind.css" rel="stylesheet" />
+  <!-- HTMX JS -->
+  <script src="/static/js/htmx.min.js"></script>
   <!-- CSRF Token Meta Tag -->
   <meta name="csrf-token" content="{{ .csrfToken }}" />
 </head>
@@ -17,9 +17,20 @@
   <nav class="bg-white shadow">
     <div class="max-w-7xl mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
-        <div class="text-xl font-bold">Jobstar</div>
+        <div class="text-xl font-bold">
+          <!-- Logo with Button -->
+          <a href="/" class="text-xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <!-- Your Logo SVG Path -->
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Jobstar
+          </a>
+        </div>
         <div>
           <a href="/vacancies" class="text-gray-700 hover:text-gray-900 px-3">Vacancies</a>
+          <a href="/candidates" class="text-gray-700 hover:text-gray-900 px-3">Candidates</a>
+          <a href="/statistics" class="text-gray-700 hover:text-gray-900 px-3">Statistics</a>
           <!-- Add more navigation links here -->
         </div>
       </div>
@@ -71,6 +82,17 @@
         this.classList.add("hidden");
         // Optionally, clear the modal content
         this.innerHTML = "";
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function (event) {
+      if (event.key === "Escape") {
+        var modal = document.getElementById("modal");
+        if (modal && !modal.classList.contains('hidden')) {
+          modal.classList.add("hidden");
+          modal.innerHTML = "";
+        }
       }
     });
   </script>

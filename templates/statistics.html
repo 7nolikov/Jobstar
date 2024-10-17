@@ -1,12 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Candidate Pipeline Statistics</title>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.0/dist/echarts.min.js"></script>
-</head>
-<body>
-    <div id="chart" style="width: 600px;height:400px;"></div>
-    {{ . }}
-</body>
-</html>
+{{ define "content" }}
+<h1 class="text-2xl font-semibold mb-4">Statistics</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold">Total Vacancies</h2>
+        <p class="text-3xl">{{ .TotalVacancies }}</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold">Total Candidates</h2>
+        <p class="text-3xl">{{ .TotalCandidates }}</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold">Filled Vacancies</h2>
+        <p class="text-3xl">{{ .FilledVacancies }}</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold">Pending Candidates</h2>
+        <p class="text-3xl">{{ .PendingCandidates }}</p>
+    </div>
+</div>
+{{ end }}

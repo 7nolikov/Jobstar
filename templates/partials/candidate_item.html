@@ -1,0 +1,23 @@
+{{ define "candidate_item" }}
+<div id="candidate-{{ .ID }}" class="bg-white p-4 rounded shadow">
+  <div class="flex justify-between items-center">
+    <div>
+      <h2 class="text-xl font-semibold">{{ .FirstName }} {{ .LastName }}</h2>
+      <p class="text-gray-600">Email: {{ .Email }}</p>
+      <p class="text-gray-600">Phone: {{ .Phone }}</p>
+      <p class="text-gray-500">Resume: {{ .Resume }}</p>
+    </div>
+    <div class="space-x-2">
+      <button hx-get="/candidates/{{ .ID }}/edit" hx-target="#modal" hx-swap="innerHTML"
+        class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+        Edit
+      </button>
+      <button hx-delete="/candidates/{{ .ID }}" hx-confirm="Are you sure you want to delete this candidate?"
+        hx-target="#candidate-{{ .ID }}" hx-swap="delete"
+        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+{{ end }}
