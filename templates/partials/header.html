@@ -1,0 +1,21 @@
+{{ define "header" }}
+<nav class="bg-white shadow">
+  <div class="max-w-7xl mx-auto px-4 py-4">
+    <div class="flex items-center justify-between">
+      <div class="text-xl font-bold flex items-center">
+        <!-- SVG Logo -->
+        <img src="/static/images/star-icon.svg" alt="Jobstar Logo" class="h-6 w-6 mr-2">
+        <a href="/" class="text-xl font-bold flex items-center">
+          Jobstar
+        </a>
+      </div>
+      <div>
+        <a href="/vacancies" class="text-gray-700 hover:text-gray-900 px-3">Vacancies</a>
+        <a href="/candidates" class="text-gray-700 hover:text-gray-900 px-3">Candidates</a>
+        <a href="/statistics" class="text-gray-700 hover:text-gray-900 px-3">Statistics</a>
+        <!-- Add more navigation links here -->
+      </div>
+    </div>
+  </div>
+</nav>
+{{ end }}

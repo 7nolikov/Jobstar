@@ -27,7 +27,7 @@ func ListVacancies(w http.ResponseWriter, r *http.Request) {
 		"csrfToken": csrf.Token(r),
 	}
 
-	templates.RenderTemplate(w, "vacancies", data)
+	templates.RenderTemplate(w, "vacancies.html", data)
 }
 
 // NewVacancyForm handles GET /vacancies/new
