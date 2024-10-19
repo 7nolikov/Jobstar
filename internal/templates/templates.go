@@ -24,23 +24,12 @@ var (
 // It ensures that initialization happens only once.
 func Init() {
 	once.Do(func() {
-		var err error
+		templateEngine = blocks.New(templatesFS).RootDir("views").Reload(true)
 
-		// Create a new blocks engine.
-		templateEngine := blocks.New(templatesFS)
-				
-
-		if err != nil {
-			log.Fatalf("Failed to create blocks engine: %v", err)
-		}
-
-		// Add embedded templates to the engine.
-		err = templateEngine.Load()
+		err := templateEngine.Load()
 		if err != nil {
 			log.Fatalf("Failed to parse embedded templates: %v", err)
 		}
-
-		log.Println("All templates successfully loaded and cached.")
 	})
 }
 
@@ -51,7 +40,7 @@ func Render(w http.ResponseWriter, tmpl string, data interface{}) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// Render the template.
-	err := templateEngine.ExecuteTemplate(w, tmpl, "", data)
+	err := templateEngine.ExecuteTemplate(w, tmpl, "main", data)
 	if err != nil {
 		log.Printf("Error rendering template '%s': %v", tmpl, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

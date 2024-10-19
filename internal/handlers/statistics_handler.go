@@ -59,5 +59,5 @@ func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
 		"csrfToken":  csrf.Token(r),
 	}
 
-	templates.Render(w, "statistics.html", dataMap)
+	templates.Render(w, "statistics", dataMap)
 }
