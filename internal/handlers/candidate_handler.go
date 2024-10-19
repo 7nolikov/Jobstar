@@ -39,10 +39,7 @@ func ListCandidates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templates.RenderTemplate(w, "candidates", map[string]interface{}{
-		"Candidates": candidates,
-		"csrfToken":  csrf.Token(r), // Pass CSRF token
-	})
+	templates.Render(w, "candidates.html", candidates)
 }
 
 // NewCandidateForm handles GET /candidates/new
@@ -50,7 +47,7 @@ func NewCandidateForm(w http.ResponseWriter, r *http.Request) {
 	data := map[string]interface{}{
 		"csrfField": csrf.TemplateField(r),
 	}
-	templates.RenderTemplate(w, "add_candidate_form", data)
+	templates.Render(w, "add_candidate_form.html", data)
 }
 
 // CreateCandidate handles POST /candidates
@@ -102,7 +99,7 @@ func CreateCandidate(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Trigger", "closeModal")
 
 		// Return the candidate item partial
-		templates.RenderTemplate(w, "candidate_item", candidate)
+		templates.Render(w, "candidate_item", candidate)
 	} else {
 		// Redirect to candidates page
 		http.Redirect(w, r, "/candidates", http.StatusSeeOther)
@@ -126,7 +123,7 @@ func EditCandidateForm(w http.ResponseWriter, r *http.Request) {
 		"csrfField": csrf.TemplateField(r),
 	}
 
-	templates.RenderTemplate(w, "edit_candidate_form", data)
+	templates.Render(w, "edit_candidate_form.html", data)
 }
 
 // UpdateCandidate handles PUT /candidates/{id}
@@ -171,7 +168,7 @@ func UpdateCandidate(w http.ResponseWriter, r *http.Request) {
 	// Check if request is from HTMX
 	if r.Header.Get("HX-Request") == "true" {
 		// Return the updated candidate item partial
-		templates.RenderTemplate(w, "candidate_item", candidate)
+		templates.Render(w, "candidate_item", candidate)
 	} else {
 		// Redirect to candidates page
 		http.Redirect(w, r, "/candidates", http.StatusSeeOther)

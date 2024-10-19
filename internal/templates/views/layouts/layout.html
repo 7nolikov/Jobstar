@@ -1,4 +1,4 @@
-{{ define "base" }}
+{{ define "layout.html" }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +10,7 @@
   <!-- HTMX JS -->
   <script src="/static/js/htmx.min.js"></script>
   <!-- CSRF Token Meta Tag -->
-  <meta name="csrf-token" content="{{ .csrfToken }}" />
+  <meta name="csrf-token" content="{{ .CSRFToken }}" />
 </head>
 
 <body class="bg-gray-100">

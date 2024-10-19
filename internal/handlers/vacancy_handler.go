@@ -27,7 +27,7 @@ func ListVacancies(w http.ResponseWriter, r *http.Request) {
 		"csrfToken": csrf.Token(r),
 	}
 
-	templates.RenderTemplate(w, "vacancies.html", data)
+	templates.Render(w, "vacancies.html", data)
 }
 
 // NewVacancyForm handles GET /vacancies/new
@@ -35,7 +35,7 @@ func NewVacancyForm(w http.ResponseWriter, r *http.Request) {
 	data := map[string]interface{}{
 		"csrfField": csrf.TemplateField(r),
 	}
-	templates.RenderTemplate(w, "add_vacancy_form", data)
+	templates.Render(w, "add_vacancy_form.html", data)
 }
 
 // CreateVacancy handles POST /vacancies
@@ -85,7 +85,7 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Trigger", "closeModal")
 
 		// Return the vacancy item partial
-		templates.RenderTemplate(w, "vacancy_item", vacancy)
+		templates.Render(w, "vacancy_item.html", vacancy)
 	} else {
 		// Redirect to vacancies page
 		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)
@@ -109,7 +109,7 @@ func EditVacancyForm(w http.ResponseWriter, r *http.Request) {
 		"csrfField": csrf.TemplateField(r),
 	}
 
-	templates.RenderTemplate(w, "edit_vacancy_form", data)
+	templates.Render(w, "edit_vacancy_form.html", data)
 }
 
 // UpdateVacancy handles PUT /vacancies/{id}
@@ -152,7 +152,7 @@ func UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 	// Check if request is from HTMX
 	if r.Header.Get("HX-Request") == "true" {
 		// Return the updated vacancy item partial
-		templates.RenderTemplate(w, "vacancy_item", vacancy)
+		templates.Render(w, "vacancy_item.html", vacancy)
 	} else {
 		// Redirect to vacancies page
 		http.Redirect(w, r, "/vacancies", http.StatusSeeOther)

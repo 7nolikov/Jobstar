@@ -1,4 +1,6 @@
-{{ define "content" }}
+{{template "layout.html" .}}
+
+{{ define "vacancies" }}
 <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-semibold">Job Vacancies</h1>
     <button hx-get="/vacancies/new" hx-target="#modal" hx-swap="innerHTML"
@@ -10,11 +12,9 @@
 <!-- Vacancies List -->
 <div id="vacancies-list" class="space-y-4">
     {{ range .Vacancies }}
-    {{ template "vacancy_item" . }}
+    {{ template "vacancy_item.html" . }}
     {{ else }}
     <p class="text-gray-600">No vacancies available.</p>
     {{ end }}
 </div>
 {{ end }}
-
-{{ template "base" . }}

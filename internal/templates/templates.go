@@ -1,72 +1,59 @@
+// internal/templates/templates.go
+
 package templates
 
 import (
-	"html/template"
-	"io/fs"
+	"embed"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"sync"
+
+	"github.com/kataras/blocks"
 )
 
-// TemplateCache holds the parsed templates
-var TemplateCache *template.Template
-var once sync.Once
+// Embed all HTML templates.
+//go:embed views/*
+var templatesFS embed.FS
 
-// Init parses all templates and caches them with detailed logging
+var (
+	templateEngine *blocks.Blocks
+	once           sync.Once
+)
+
+// Init initializes the blocks engine and parses all templates.
+// It ensures that initialization happens only once.
 func Init() {
 	once.Do(func() {
 		var err error
-		// Initialize a new template
-		TemplateCache = template.New("")
 
-		// Walk through the templates directory and parse each .html file
-		err = filepath.Walk("templates", func(path string, info fs.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() && filepath.Ext(path) == ".html" {
-				relPath, err := filepath.Rel("templates", path)
-				if err != nil {
-					return err
-				}
-				// Read the file content
-				content, err := os.ReadFile(path)
-				if err != nil {
-					return err
-				}
-				// Parse the template file
-				_, err = TemplateCache.New(relPath).Parse(string(content))
-				if err != nil {
-					log.Printf("Error parsing template %s: %v", relPath, err)
-					return err
-				}
-				log.Printf("Loaded template: %s", relPath)
-			}
-			return nil
-		})
+		// Create a new blocks engine.
+		templateEngine := blocks.New(templatesFS)
+				
 
 		if err != nil {
-			log.Fatalf("Error walking through templates: %v", err)
+			log.Fatalf("Failed to create blocks engine: %v", err)
+		}
+
+		// Add embedded templates to the engine.
+		err = templateEngine.Load()
+		if err != nil {
+			log.Fatalf("Failed to parse embedded templates: %v", err)
 		}
 
 		log.Println("All templates successfully loaded and cached.")
 	})
 }
 
-// RenderTemplate executes the specified template
-func RenderTemplate(w http.ResponseWriter, name string, data interface{}) {
-	tmpl := TemplateCache.Lookup(name)
-	if tmpl == nil {
-		log.Printf("Template '%s' not found", name)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+// Render renders a specified template with provided data.
+func Render(w http.ResponseWriter, tmpl string, data interface{}) {
 
-	err := tmpl.Execute(w, data)
+	// Set the response header content type.
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// Render the template.
+	err := templateEngine.ExecuteTemplate(w, tmpl, "", data)
 	if err != nil {
-		log.Printf("Error executing template '%s': %v", name, err)
+		log.Printf("Error rendering template '%s': %v", tmpl, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

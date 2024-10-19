@@ -11,5 +11,5 @@ func LandingPage(w http.ResponseWriter, r *http.Request) {
     data := map[string]interface{}{
         "csrfToken": csrf.Token(r),
     }
-    templates.RenderTemplate(w, "base", data)
-}
+    templates.Render(w, "landing.html", data)
+	}
