@@ -37,22 +37,6 @@ func StatisticsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch Filled Vacancies (assuming a 'filled' boolean column)
-	err = db.DB.Get(&data.FilledVacancies, "SELECT COUNT(*) FROM vacancies WHERE filled = TRUE")
-	if err != nil {
-		log.Printf("Error fetching filled vacancies: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// Fetch Pending Candidates (assuming a 'status' column)
-	err = db.DB.Get(&data.PendingCandidates, "SELECT COUNT(*) FROM candidates WHERE status = 'pending'")
-	if err != nil {
-		log.Printf("Error fetching pending candidates: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	// Pass statistics data to the template
 	dataMap := map[string]interface{}{
 		"Statistics": data,
