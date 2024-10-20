@@ -1,8 +1,10 @@
 CREATE TABLE IF NOT EXISTS candidates (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    vacancy_id INTEGER REFERENCES vacancies(id),
+    phone VARCHAR(255),
+    resume TEXT,
     state VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -39,7 +39,12 @@ func ListCandidates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templates.Render(w, "candidates", candidates)
+	data := map[string]interface{}{
+		"Candidates": candidates,
+		"csrfToken":  csrf.Token(r),
+	}
+
+	templates.Render(w, "candidates", data)
 }
 
 // NewCandidateForm handles GET /candidates/new
